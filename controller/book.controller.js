@@ -25,10 +25,4 @@ module.exports.getBookById = (req, res) => {
     res.status(200).json(book)
 }
 
-module.exports.getBook = (req, res) => {
-    let id = req.params.id;
-    let book = books.filter(book => book.id == id)
-    res.status(200).json(book)
-}
-
 
