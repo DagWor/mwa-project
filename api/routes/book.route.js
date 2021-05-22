@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bookController = require('../controller/book.controller')
-const authorController = require('../controller/author.controller')
+const userController = require('../controller/user.controller')
 const reviewController = require('../controller/review.controller')
 
 router.route('/books')
@@ -14,12 +14,12 @@ router.route('/book/:id')
 .patch(bookController.patchOneBook)
 .delete(bookController.deleteOneBook)
 
-router.route('/book/:id/author')
-.get(authorController.getBookAuthor)
-.delete(authorController.deleteOneAuthor)
-.put(authorController.updateOneAuthor)
-.post(authorController.addOneAuthor)
-.patch(authorController.patchOneAuthor)
+router.route('/book/:id/user')
+.get(userController.getBookAuthor)
+.delete(userController.deleteOneAuthor)
+.put(userController.updateOneAuthor)
+.post(userController.addOneAuthor)
+.patch(userController.patchOneAuthor)
 
 router.route('/book/:id/reviews')
 .get(reviewController.getAllReviews)

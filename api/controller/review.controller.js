@@ -1,6 +1,6 @@
 const { response } = require('express');
 const Book = require('../data/book.model');
-const { getBookAuthor } = require('./author.controller');
+const { getBookAuthor } = require('./user.controller');
 
 module.exports.getAllReviews = (req, res) => {
     const response = {
