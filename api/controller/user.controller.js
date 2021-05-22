@@ -1,35 +1,22 @@
 const Book = require('../data/book.model')
+const User = require('../data/user.model')
 
-const _addAuthor = (req, res, book, response) => {
-    book.author.name = req.body.name;
-    if (req.body.rating) book.author.rating = req.body.rating
-    book.save((err, updatedBook) => {
-        if (err) {
-            response.status = 500;
-            response.message = err;
-        } else response.message = updatedBook
+module.exports.addOneUser = (req, res) => {
+    const newUser = {};
+    newUser.name = req.body.name
+    newUser.role = req.body.role
 
-        res.status(response.status).json(response.message)
-    })
-}
-
-module.exports.addOneAuthor = (req, res) => {
-    Book.findById(req.params.id).exec((err, book) => {
+    User.create(newUser, (err, user) => {
         const response = {
             status: 201,
-            message: book
+            message: user
         }
-
         if (err) {
-            reqponse.status = 500;
-            response.message = err;
-        } else if (!book) {
-            response.status = 404;
-            response.message = 'book not found'
-        }
-
-        if (book) _addAuthor(req, res, book, response);
-        else res.status(response.status).json(response.message);
+            response.status = 500;
+            response.message = err
+        } 
+        
+        res.status(response.status).json(response.message)
     })
 }
 
@@ -47,10 +34,25 @@ module.exports.getBookAuthor = (req, res) => {
 
         if (!book) response.message = 'Book not found'
 
-        if (book.author) response.message = book.author
-        else response.message = 'Author not found'
+        if (book.author) {
+            User.findById(book.author.toString()).exec((err, user) => {
 
-        res.status(response.status).json(response.message)
+                if (err) {
+                    response.status = 500
+                    response.message = 'Internal Server Error'
+                }
+
+                if (!user) response.message = 'Author not found'
+                else response.message = user
+
+                res.status(response.status).json(response.message)
+            })
+        }
+        else {
+            response.message = 'Author not found'
+            res.status(response.status).json(response.message)
+        }
+
     });
 }
 
@@ -69,17 +71,28 @@ module.exports.deleteOneAuthor = (req, res) => {
         }
 
         else {
-            book.author.remove()
-            book.save((err, book) => {
+            User.findByIdAndDelete(book.author.toString()).exec((err, deletedUser) => {
                 if (err) {
                     response.satus = 500
                     response.message = 'Internal Server Error'
-                } else if (!book) {
+                } else if (!deletedUser) {
                     response.status = 404
                     response.message = 'Author not found'
-                }
+                } else {
+                    book.author.remove()
 
-                res.status(response.status).json(response.message)
+                    book.save((err, book) => {
+                        if (err) {
+                            response.satus = 500
+                            response.message = 'Internal Server Error'
+                        } else if (!book) {
+                            response.status = 404
+                            response.message = 'Author not found'
+                        }
+
+                        res.status(response.status).json(response.message)
+                    })
+                }
             })
         }
     });
@@ -95,7 +108,7 @@ module.exports.patchOneAuthor = (req, res) => {
         if (err) {
             response.status = 500
             response.message = 'Internal Server Error'
-            
+
         }
         else if (!book) {
             response.status = 404
@@ -124,6 +137,7 @@ module.exports.patchOneAuthor = (req, res) => {
 
 
 module.exports.updateOneAuthor = (req, res) => {
+
     Book.findById(req.params.id).exec((err, book) => {
         const response = {
             status: 201,
@@ -133,7 +147,7 @@ module.exports.updateOneAuthor = (req, res) => {
         if (err) {
             response.status = 500
             response.message = 'Internal Server Error'
-            
+
         }
         else if (!book) {
             response.status = 404
@@ -143,8 +157,34 @@ module.exports.updateOneAuthor = (req, res) => {
 
         else {
             if (book.author) {
-                if(req.body && req.body.name){
-                    if(req.body.rating) book.author.rating = req.body.rating 
+                if (req.body && req.body.name) {
+                    User.findById(book.author.toString()).exec((err, user) => {
+                        if (err) {
+                            response.status = 500
+                            response.message = 'Error finding author'
+                        } else if (!user) {
+                            response.status = 404
+                            response.message = 'User not found'
+                        }
+
+                        if (response.status !== 201) res.status(response.status).json(response.message)
+                        else {
+                            user.name = req.body.name
+                            user.save((err, updatedUser) => {
+                                if (err) {
+                                    response.status = 500
+                                    response.message = 'Error finding author'
+                                } else if (!updatedUser) {
+                                    response.status = 404
+                                    response.message = 'User not found'
+                                }
+                                res.status(response.status).json(response.message)
+
+                            })
+                        }
+                    })
+
+                    /*if(req.body.rating) book.author.rating = req.body.rating 
                     else book.author.rating = book.author.rating
 
                     book.author.name = req.body.name
@@ -156,10 +196,37 @@ module.exports.updateOneAuthor = (req, res) => {
                             response.message = updatedbook
                         }
                         res.status(response.status).json(response.message)
-                    })
+                    })*/
                 }
             } else res.status(404).json({ 'message': 'publisher not found' })
         }
     });
 }
 
+module.exports.getAuthorBooks = (req, res) => {
+    User.findById(req.params.id).exec((err, author) => {
+        const response = {
+            status: 200,
+            message: author
+        }
+        if (err) {
+            response.status = 500
+            response.message = "Internal Server Error"
+        } else if (!book) {
+            response.status = 404
+            response.message = "author not found in database"
+        } else {
+            Book.find({author: author._id}).exec((err, books) => {
+                if (err) {
+                    response.status = 500
+                    response.message = "Internal Server Error"
+                } else if (!books) {
+                    response.status = 404
+                    response.message = "books not found in database"
+                } else response.message = books
+                
+                res.status(response.status).json(response.message)
+            })
+        }
+    })
+}

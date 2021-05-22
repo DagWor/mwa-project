@@ -14,12 +14,15 @@ router.route('/book/:id')
 .patch(bookController.patchOneBook)
 .delete(bookController.deleteOneBook)
 
-router.route('/book/:id/user')
+router.route('/book/:id/author')
 .get(userController.getBookAuthor)
 .delete(userController.deleteOneAuthor)
 .put(userController.updateOneAuthor)
 .post(userController.addOneAuthor)
 .patch(userController.patchOneAuthor)
+
+router.route('/author/:id')
+.get(userController.getAuthorBooks)
 
 router.route('/book/:id/reviews')
 .get(reviewController.getAllReviews)
