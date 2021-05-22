@@ -1,6 +1,5 @@
 const { response } = require('express');
 const Book = require('../data/book.model');
-const { getBookAuthor } = require('./user.controller');
 
 module.exports.getAllReviews = (req, res) => {
     const response = {
@@ -154,9 +153,8 @@ module.exports.updateOneReview = (req, res) => {
                         if (err) {
                             response.status = 500
                             response.message = err
-                        } else {
-                            response.message = updatedbook
-                        }
+                        } else response.message = updatedbook
+                        
                         res.status(response.status).json(response.message)
                     })
                 } else res.status(404).json({ 'message': "review not found" })
@@ -209,9 +207,8 @@ module.exports.patchOneReview = (req, res) => {
                             if (err) {
                                 response.status = 500
                                 response.message = err
-                            } else {
-                                response.message = updatedBook
-                            }
+                            } else response.message = updatedBook
+                
                             res.status(response.status).json(response.message)
                         })
                     } else res.status(404).json({ 'message': "review not found" })
