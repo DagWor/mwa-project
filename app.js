@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
-const api = require('./routes');
+const api = require('./api/routes/book.route');
 const path = require('path')
+require('./api/data/db');
 
 app.set('port', 5000);
 
