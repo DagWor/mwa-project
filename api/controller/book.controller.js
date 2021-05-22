@@ -1,6 +1,10 @@
 const Book = require('../data/book.model')
 
 module.exports.getAllBooks = (req, res) => {
+    const response = {
+        status: 200,
+        message: ''
+    }
     let offset = 0
     let count = 5
 
@@ -9,26 +13,25 @@ module.exports.getAllBooks = (req, res) => {
     if (req.query && req.query.offset) offset = parseInt(req.query.offset);
     if (req.query && req.query.count) count = parseInt(req.query.count);
 
-    if (isNaN(offset) || isNaN(count)) res.status(400).json({ 'message': 'Query String offset and count should be numbers' });
+    if (isNaN(offset) || isNaN(count)) {
+        response.status = 400
+        response.message = 'Query String offset and count should be numbers'
+    }
 
-    if (count > maxCount) res.status(400).json({ 'message': 'Count can not be greater than ' + maxCount });
+    if (count > maxCount) {
+        response.status = 400
+        response.message = `Count can not be greater than ${maxCount}`
+    }
+    if(response.status !== 200) res.status(response.status).json(response.message);
 
     Book.find().exec((err, books) => {
-        const response = {
-            status: 200,
-            message: books
-        }
 
         if (err) {
             response.status = 500
             response.message = 'Server Issues'
         }
-        else if (!books) {
-            response.message = 'No books found'
-        } else {
-            response.message = books.slice(offset, count)
-
-        }
+        else if (!books) response.message = 'No books found'
+        else response.message = books.slice(offset, count)
 
         res.status(response.status).json(response.message)
     })
@@ -64,13 +67,13 @@ module.exports.addOneBook = (req, res) => {
         newBook.title = req.body.title
         newBook.year = `${new Date(req.body.year).getFullYear()}`
         newBook.edition = req.body.edition;
-        newBook.author = req.body.author;
+        newBook.author = "to be done";
 
-        Book.create(newBook, (err, student) => {
+        Book.create(newBook, (err, book) => {
             if (err) {
                 response.status = 500;
                 response.message = err
-            } else response.message = student
+            } else response.message = book
 
             res.status(response.status).json(response.message);
         })
@@ -103,11 +106,11 @@ module.exports.updateOneBook = (req, res) => {
                 return;
             }
 
-            else if (req.body && req.body.title && req.body.edition && req.body.author && req.body.year) {
+            else if (req.body && req.body.title && req.body.edition && req.body.year) {
 
                 book.title = req.body.title
                 book.edition = req.body.edition
-                book.author = req.body.author
+                book.author = "to be done"
                 book.year = req.body.year
 
                 book.save((err, updatedbook) => {
@@ -148,7 +151,6 @@ module.exports.patchOneBook = (req, res) => {
                 if (req.body.title) book.title = req.body.title
                 if (req.body.year) book.year = req.body.year
                 if (req.body.edition) book.edition = req.body.edition
-                if (req.body.author) book.author = req.body.author
 
                 book.save((err, updatedbook) => {
                     if (err) {
@@ -188,4 +190,3 @@ module.exports.deleteOneBook = (req, res) => {
     })
 
 }
-
