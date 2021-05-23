@@ -5,10 +5,17 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 
 const ReviewSchema = new Schema({
-    review: String,
+    review: {
+        type: String,
+        required: true
+    },
     createdDate: {
         type: Date,
         default: Date.now()
+    },
+    rating: {
+        type: Number,
+        required: true
     }
 })
 
@@ -37,7 +44,6 @@ const BookSchema = new Schema({
         default: 'Future work'
     },
     reviews: [ReviewSchema],
-    rating: Number,
     createdDate: {
         type: Date,
         default: Date.now()

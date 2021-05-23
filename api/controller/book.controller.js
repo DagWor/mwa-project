@@ -50,9 +50,7 @@ module.exports.getBookById = (req, res) => {
         } else if (!book) {
             response.status = 404
             response.message = 'Book not found'
-        } else if (book) {
-            response.message = book
-        }
+        } else if (book) response.message = book
         res.status(response.status).json(response.message)
     })
 }
@@ -101,10 +99,7 @@ module.exports.updateOneBook = (req, res) => {
                 response.status = 404
                 response.message = 'book not found'
             }
-            if (response.status !== 201) {
-                res.status(response.status).json(response.message)
-                return;
-            }
+            if (response.status !== 201) res.status(response.status).json(response.message)
 
             else if (req.body && req.body.title && req.body.edition && req.body.year) {
 

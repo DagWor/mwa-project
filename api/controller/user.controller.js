@@ -183,20 +183,6 @@ module.exports.updateOneAuthor = (req, res) => {
                             })
                         }
                     })
-
-                    /*if(req.body.rating) book.author.rating = req.body.rating 
-                    else book.author.rating = book.author.rating
-
-                    book.author.name = req.body.name
-                    book.save((err, updatedbook) => {
-                        if (err) {
-                            response.status = 500
-                            response.message = err
-                        } else {
-                            response.message = updatedbook
-                        }
-                        res.status(response.status).json(response.message)
-                    })*/
                 }
             } else res.status(404).json({ 'message': 'publisher not found' })
         }

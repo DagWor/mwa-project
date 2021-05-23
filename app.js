@@ -14,4 +14,3 @@ const server = app.listen(app.get('port'), () => {
     const port = server.address().port;
     console.log(`Listening on port ${port}`);
 })
-
